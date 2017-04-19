@@ -1,6 +1,6 @@
 {
   "name": "antigate2",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Antigate client",
   "main": "index.js",
   "scripts": {
