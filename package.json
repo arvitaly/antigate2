@@ -1,0 +1,33 @@
+{
+  "name": "antigate2",
+  "version": "0.0.1",
+  "description": "Antigate client",
+  "main": "index.js",
+  "scripts": {
+    "test": "tsc && tslint --project=tsconfig.json && jest --verbose --coverage",
+    "watch:test": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arvitaly/antigate2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arvitaly/antigate2/issues"
+  },
+  "homepage": "https://github.com/arvitaly/antigate2#readme",
+  "jest": {},
+  "devDependencies": {
+    "@types/jest": "^19.2.2",
+    "coveralls": "^2.13.0",
+    "jest": "^19.0.2",
+    "tslint": "^5.1.0",
+    "typescript": "^2.2.2"
+  },
+  "dependencies": {
+    "@types/node-fetch": "^1.6.7",
+    "node-fetch": "^1.6.3"
+  }
+}
