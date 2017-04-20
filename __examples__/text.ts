@@ -1,5 +1,5 @@
 // tslint:disable no-console
-import Antigate from "./Antigate";
+import Antigate from "./../Antigate";
 
 const antigate = new Antigate({
     key: process.argv[2],

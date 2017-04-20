@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import constants from "./constants";
 export interface IConfig {
     key: string;
+    baseUrl?: string;
 }
 export interface IBaseTask {
     type: string;
@@ -56,7 +57,11 @@ export interface ICreateTaskParams {
     languagePool: "en" | "rn";
 }
 class Antigate {
-    constructor(protected config: IConfig) { }
+    constructor(protected config: IConfig) {
+        if (!config.baseUrl) {
+            config.baseUrl = "https://api.anti-captcha.com";
+        }
+    }
     public async createTask(params: ICreateTaskParams): Promise<ICreateTaskResponse> {
         if (!params.clientKey) {
             params.clientKey = this.config.key;
@@ -64,7 +69,7 @@ class Antigate {
         if (params.task.type === "ImageToTextTask") {
             params.task.body = params.task.body.replace("data:image/jpeg;base64,", "");
         }
-        const res = await fetch("https://api.anti-captcha.com/createTask", {
+        const res = await fetch(this.config.baseUrl + "/createTask", {
             method: "POST",
             body: JSON.stringify(params),
             headers: {
@@ -74,7 +79,7 @@ class Antigate {
         return res.json();
     }
     public async getTaskResult(taskId: number): Promise<IGetTaskResultResponse> {
-        const res = await fetch("https://api.anti-captcha.com/getTaskResult", {
+        const res = await fetch(this.config.baseUrl + "/getTaskResult", {
             method: "POST",
             body: JSON.stringify({
                 clientKey: this.config.key,
@@ -86,14 +91,20 @@ class Antigate {
         });
         return res.json();
     }
-    public async getRecaptcha(websiteURL: string, websiteKey: string) {
+    public async getNoCaptcha(websiteURL: string, websiteKey: string) {
         return (await this.request({
             type: "NoCaptchaTaskProxyless",
             websiteKey,
             websiteURL,
         } as INoCaptchaTaskProxyless, "en") as INoCaptchaSolution);
     }
-    public async request(task: IImageToTextTask | INoCaptchaTaskProxyless, languagePool: "en" | "rn"): Promise<INoCaptchaSolution | IImageToTextSolution> {
+    public async getByBase64(data: string): Promise<string> {
+        return ((await this.request({
+            type: "ImageToTextTask",
+            body: data,
+        }, "rn")) as IImageToTextSolution).text;
+    }
+    protected async request(task: IImageToTextTask | INoCaptchaTaskProxyless, languagePool: "en" | "rn"): Promise<INoCaptchaSolution | IImageToTextSolution> {
         const response = await this.createTask({
             languagePool,
             task,
@@ -110,12 +121,6 @@ class Antigate {
                 return res.solution;
             }
         } while (true);
-    }
-    public async getByBase64(data: string): Promise<string> {
-        return ((await this.request({
-            type: "ImageToTextTask",
-            body: data,
-        }, "rn")) as IImageToTextSolution).text;
     }
 }
 export default Antigate;

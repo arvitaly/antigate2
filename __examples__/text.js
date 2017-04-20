@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // tslint:disable no-console
-const Antigate_1 = require("./Antigate");
+const Antigate_1 = require("./../Antigate");
 const antigate = new Antigate_1.default({
     key: process.argv[2],
 });

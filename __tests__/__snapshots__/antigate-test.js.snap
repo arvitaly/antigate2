@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`when getByBase64, should call server with params 1`] = `"/createTask"`;
+
+exports[`when getByBase64, should call server with params 2`] = `
+Object {
+  "clientKey": "112",
+  "languagePool": "rn",
+  "task": Object {
+    "body": "/9j/4AAQSkZJRgABAQAAAQABAAD",
+    "type": "ImageToTextTask",
+  },
+}
+`;
+
+exports[`when getByBase64, should call server with params 3`] = `"/getTaskResult"`;
+
+exports[`when getByBase64, should call server with params 4`] = `
+Object {
+  "clientKey": "112",
+  "taskId": 111,
+}
+`;
+
+exports[`when getByBase64, should call server with params 5`] = `"/getTaskResult"`;
+
+exports[`when getByBase64, should call server with params 6`] = `
+Object {
+  "clientKey": "112",
+  "taskId": 111,
+}
+`;
+
+exports[`when nocaptcha, should call server with params 1`] = `"/createTask"`;
+
+exports[`when nocaptcha, should call server with params 2`] = `
+Object {
+  "clientKey": "112",
+  "languagePool": "en",
+  "task": Object {
+    "type": "NoCaptchaTaskProxyless",
+    "websiteKey": "test2",
+    "websiteURL": "test1",
+  },
+}
+`;
+
+exports[`when nocaptcha, should call server with params 3`] = `"/getTaskResult"`;
+
+exports[`when nocaptcha, should call server with params 4`] = `
+Object {
+  "clientKey": "112",
+  "taskId": 112,
+}
+`;
+
+exports[`when nocaptcha, should call server with params 5`] = `"/getTaskResult"`;
+
+exports[`when nocaptcha, should call server with params 6`] = `
+Object {
+  "clientKey": "112",
+  "taskId": 112,
+}
+`;
+
+exports[`when nocaptcha, should call server with params 7`] = `
+Object {
+  "gRecaptchaResponse": "cpatchId",
+}
+`;
