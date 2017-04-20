@@ -47,7 +47,7 @@ export interface IImageToTextSolution {
 }
 export interface INoCaptchaSolution {
     gRecaptchaResponse: string; // Хеш который необходимо подставить в форму с рекапчей в <textarea id="g-recaptcha-response" ..></textarea> . Имеет длину от 500 до 2190 байт.
-    gRecaptchaResponseMD5: string; // Контрольная сумма gRecaptchaResponse в MD5. Передается только если добавить параметр isExtended со значением true в методе getTaskResult. Сделано исключительно для отладки, чтобы разработчик мог убедиться что получает хэш целиком. 
+    gRecaptchaResponseMD5: string; // Контрольная сумма gRecaptchaResponse в MD5. Передается только если добавить параметр isExtended со значением true в методе getTaskResult. Сделано исключительно для отладки, чтобы разработчик мог убедиться что получает хэш целиком.
 }
 export interface ICreateTaskParams {
     clientKey?: string;
