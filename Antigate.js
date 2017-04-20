@@ -19,7 +19,9 @@ class Antigate {
             if (!params.clientKey) {
                 params.clientKey = this.config.key;
             }
-            params.task.body = params.task.body.replace("data:image/jpeg;base64,", "");
+            if (params.task.type === "ImageToTextTask") {
+                params.task.body = params.task.body.replace("data:image/jpeg;base64,", "");
+            }
             const res = yield node_fetch_1.default("https://api.anti-captcha.com/createTask", {
                 method: "POST",
                 body: JSON.stringify(params),
@@ -45,30 +47,41 @@ class Antigate {
             return res.json();
         });
     }
-    getByBase64(data) {
+    getRecaptcha(websiteURL, websiteKey) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.request({
+                type: "NoCaptchaTaskProxyless",
+                websiteKey,
+                websiteURL,
+            }, "en");
+        });
+    }
+    request(task, languagePool) {
         return __awaiter(this, void 0, void 0, function* () {
             const response = yield this.createTask({
-                languagePool: "rn",
-                task: {
-                    type: "ImageToTextTask",
-                    body: data,
-                },
+                languagePool,
+                task,
             });
             if (response.errorId > 0) {
                 throw new Error(response.errorCode + ":" + response.errorDescription);
             }
-            let text = "";
             do {
                 const res = yield this.getTaskResult(response.taskId);
                 if (res.errorId > 0) {
                     throw new Error(res.errorCode + ":" + res.errorDescription);
                 }
                 if (res.status === "ready") {
-                    text = res.solution.text;
-                    break;
+                    return res.solution;
                 }
-            } while (text === "");
-            return text;
+            } while (true);
+        });
+    }
+    getByBase64(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return (yield this.request({
+                type: "ImageToTextTask",
+                body: data,
+            }, "rn")).text;
         });
     }
 }

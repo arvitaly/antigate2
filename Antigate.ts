@@ -17,6 +17,12 @@ export interface IImageToTextTask {
     minLength?: number; // Integer	0..20, 0 - нет требований, > 1 - определяет минимальную длину ответа
     maxLength?: number; // Integer	0..20, 0 - нет требований, > 1 - определяет максимальную длину ответа
 }
+export interface INoCaptchaTaskProxyless {
+    type: "NoCaptchaTaskProxyless";
+    websiteURL: string; // Адрес страницы на которой решается капча
+    websiteKey: string; // Ключ-индентификатор рекапчи на целевой странице. <div class="g-recaptcha" data-sitekey="ВОТ_ЭТОТ"></div>
+    websiteSToken?: string; // Секретный токен для предыдущей версии рекапчи. В большинстве случаев сайты используют новую версию и этот токен не требуется.
+}
 export interface ICreateTaskResponse {
     errorId: number;
     errorCode: string;
@@ -28,7 +34,7 @@ export interface IGetTaskResultResponse {
     errorCode: string; // Error code. Check out errors list.
     errorDescription: string; // Short information describing error
     status: "processing" | "ready"; // processing - task is not ready yet, ready - task complete, solution object can be found in solution property
-    solution: IImageToTextSolution; // Task result data
+    solution: IImageToTextSolution | INoCaptchaSolution; // Task result data
     cost: number; // Double.	Task cost in USD.
     ip: string; // IP from which the task was created.
     createTime: number; // Integer.	UNIX Timestamp of task creation.
@@ -39,9 +45,13 @@ export interface IImageToTextSolution {
     text: string; // Captcha answer
     url: string; // Web address where captcha file can be downloaded. Available withing 48 hours after task creation.
 }
+export interface INoCaptchaSolution {
+    gRecaptchaResponse: string; // Хеш который необходимо подставить в форму с рекапчей в <textarea id="g-recaptcha-response" ..></textarea> . Имеет длину от 500 до 2190 байт.
+    gRecaptchaResponseMD5: string; // Контрольная сумма gRecaptchaResponse в MD5. Передается только если добавить параметр isExtended со значением true в методе getTaskResult. Сделано исключительно для отладки, чтобы разработчик мог убедиться что получает хэш целиком. 
+}
 export interface ICreateTaskParams {
     clientKey?: string;
-    task: IImageToTextTask;
+    task: IImageToTextTask | INoCaptchaTaskProxyless;
     softId?: number;
     languagePool: "en" | "rn";
 }
@@ -51,7 +61,9 @@ class Antigate {
         if (!params.clientKey) {
             params.clientKey = this.config.key;
         }
-        params.task.body = params.task.body.replace("data:image/jpeg;base64,", "");
+        if (params.task.type === "ImageToTextTask") {
+            params.task.body = params.task.body.replace("data:image/jpeg;base64,", "");
+        }
         const res = await fetch("https://api.anti-captcha.com/createTask", {
             method: "POST",
             body: JSON.stringify(params),
@@ -74,29 +86,36 @@ class Antigate {
         });
         return res.json();
     }
-    public async getByBase64(data: string): Promise<string> {
+    public async getRecaptcha(websiteURL: string, websiteKey: string) {
+        return (await this.request({
+            type: "NoCaptchaTaskProxyless",
+            websiteKey,
+            websiteURL,
+        } as INoCaptchaTaskProxyless, "en") as INoCaptchaSolution);
+    }
+    public async request(task: IImageToTextTask | INoCaptchaTaskProxyless, languagePool: "en" | "rn"): Promise<INoCaptchaSolution | IImageToTextSolution> {
         const response = await this.createTask({
-            languagePool: "rn",
-            task: {
-                type: "ImageToTextTask",
-                body: data,
-            },
+            languagePool,
+            task,
         });
         if (response.errorId > 0) {
             throw new Error(response.errorCode + ":" + response.errorDescription);
         }
-        let text = "";
         do {
             const res = await this.getTaskResult(response.taskId);
             if (res.errorId > 0) {
                 throw new Error(res.errorCode + ":" + res.errorDescription);
             }
             if (res.status === "ready") {
-                text = res.solution.text;
-                break;
+                return res.solution;
             }
-        } while (text === "");
-        return text;
+        } while (true);
+    }
+    public async getByBase64(data: string): Promise<string> {
+        return ((await this.request({
+            type: "ImageToTextTask",
+            body: data,
+        }, "rn")) as IImageToTextSolution).text;
     }
 }
 export default Antigate;
