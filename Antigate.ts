@@ -1,6 +1,5 @@
 // tslint:disable max-line-length
 import fetch from "node-fetch";
-import constants from "./constants";
 export interface IConfig {
     key: string;
     baseUrl?: string;

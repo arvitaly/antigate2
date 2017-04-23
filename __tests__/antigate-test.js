@@ -37,7 +37,7 @@ it("when getByBase64, should call server with params", () => __awaiter(this, voi
         key,
         baseUrl: "http://127.0.0.1:" + port,
     });
-    createTaskFn.mockImplementation((url, headers, body) => {
+    createTaskFn.mockImplementation((url, _, body) => {
         expect(url).toMatchSnapshot();
         expect(body).toMatchSnapshot();
         return {
@@ -45,7 +45,7 @@ it("when getByBase64, should call server with params", () => __awaiter(this, voi
         };
     });
     let attemptCount = 0;
-    getTaskResultFn.mockImplementation((url, headers, body) => {
+    getTaskResultFn.mockImplementation((url, _, body) => {
         expect(url).toMatchSnapshot();
         expect(body).toMatchSnapshot();
         return {
@@ -64,7 +64,7 @@ it("when nocaptcha, should call server with params", () => __awaiter(this, void 
         key,
         baseUrl: "http://127.0.0.1:" + port,
     });
-    createTaskFn.mockImplementation((url, headers, body) => {
+    createTaskFn.mockImplementation((url, _, body) => {
         expect(url).toMatchSnapshot();
         expect(body).toMatchSnapshot();
         return {
@@ -72,7 +72,7 @@ it("when nocaptcha, should call server with params", () => __awaiter(this, void 
         };
     });
     let attemptCount = 0;
-    getTaskResultFn.mockImplementation((url, headers, body) => {
+    getTaskResultFn.mockImplementation((url, _, body) => {
         expect(url).toMatchSnapshot();
         expect(body).toMatchSnapshot();
         return {
